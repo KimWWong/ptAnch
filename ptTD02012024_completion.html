@@ -46,6 +46,7 @@
     // NOTE TO KIM: NEED TO ADD ONE MORE QUESTION TO JUST ASK WHAT LETTER OR NUMBER THEY JUST SAW. AND THEN ADJUST ANALYSIS CODE.
     // 02.19.2024 word completion version
     // 02.26.2024 made div rotation work, BUT DO NOT DIV FLIP WHEN IT COMES TO THE LETTER TASK
+    // 03.11.2024 - adding stuff for w-m letter changes.
 
 
     /*
@@ -290,8 +291,10 @@
     */
 
     /* -------- defining factors && exptdesign (*factors) --------*/
-    var possAgent = ["f"];
-    var possTableNum = ["letterD","letterP"];
+    var possAgent = ["fb"];
+    // var possTableNum = ["letterD","letterP"];
+    var possTableNum = ["letterM","letterW"];
+    // var possTableNum = ["16","91"];
     // var possColor = ["gd","gl"]
     var possColor = ["r","b"]
     var letterSharpness = 'sharp'
@@ -301,8 +304,8 @@
     // var possPrimeAligns = [false,true]
     var possPrimeAligns = [false, true]
 
-    // var possSym = [1,2,3,4];
-    var possSym = [3,4];
+    var possSym = [1,2,3,4];
+    // var possSym = [3,4];
 
 
     /*new randomization method*/
@@ -340,11 +343,12 @@
 
 
     forPreload.push(stimFolder+"blank_f.png");
-    // forPreload.push(stimFolder+"blank_t.png");
+    forPreload.push(stimFolder+"blank_fb.png");
     forPreload.push(stimFolder+"logoY.png");
     forPreload.push(stimFolder+"logoS.png");
     if (runPriming == false){
-        forPreload.push(stimFolder+"suitcase.png");
+        console.log("anchoring running");
+        // forPreload.push(stimFolder+"suitcase.png");
         // forPreload.push(stimFolder+"watch.png");
         // forPreload.push(stimFolder+"headphone.png");
     } else {
@@ -595,7 +599,19 @@
                     } else {
                         data.thisPrimed = 0;
                     }
-                } else {
+                } else if (data.key_press == 87) {
+                    if (data.thisAnchNum == 'letterW'){
+                        data.thisPrimed = 1;
+                    } else {
+                        data.thisPrimed = 0;
+                    }
+                } else if (data.key_press == 77) {
+                    if (data.thisAnchNum == 'letterM'){
+                        data.thisPrimed = 1;
+                    } else {
+                        data.thisPrimed = 0;
+                    }
+                }else {
                     data.thisPrimed = "Kim your letter keycodes are broken";
                 }
             } /*if answer end*/
@@ -1050,6 +1066,10 @@
                 var noiseLetter = 'letterN'
             } else if (thisAnchNum == 'letterN') {
                 var noiseLetter = 'letterU'
+            } else if (thisAnchNum == 'letterM') {
+                var noiseLetter = 'letterW'
+            } else if (thisAnchNum == 'letterW') {
+                var noiseLetter = 'letterM'
             }
         }
         // console.log(noiseLetter);
@@ -1057,8 +1077,10 @@
         var wordCompletion = {
             type: 'html-keyboard-response',
             stimulus: function(){
-                var text = "<p>Great, now fill in the blank! Type one letter on your keyboard to complete the word below:</p>"
-                var prime = "<p style='font-size:3.0vh'> <b>_</b> o o r</p>"
+                var text = "<p>Great, now fill in the blank! Type one letter on your keyboard to complete the word below (the letter must be a <i>consonsant</i>) :</p>"
+                // var prime = "<p style='font-size:3.0vh'> <b>_</b> o o r</p>"
+                // var prime = "<p style='font-size:3.0vh'>l i <b>_</b></p>"
+                var prime = "<p style='font-size:3.0vh'><b>_</b> A T C H</p>"
                 return text+prime
             },
             choices: ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"],
@@ -1138,8 +1160,13 @@
         var possRandLocation = [0,0,0,0]
         var counterColor = 0
         var possRandColors1 = shuffle(["r","b"])
+        // var possRandColors1 = shuffle(["gl","gd"])
         if (randColor == "r"){
             possRandColors1.push("b")
+        } else if (randColor == 'gl'){
+            possRandColors1.push("gd")
+        } else if (randColor == 'gd'){
+            possRandColors1.push("gl")
         } else if (randColor == "b"){
             possRandColors1.push("r")
         } else {

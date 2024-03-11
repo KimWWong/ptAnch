@@ -28,14 +28,15 @@ def layerImages(backgroundImg, firstLayerImg, secondLayerImg, newImgName):
 
     baseImg.save(outFolder + newImgName + ".png", "PNG")
 
-possAgent = ["f"]
-possColor = ["gl","gd"]
+possAgent = ["fb","f"]
+possColor = ["b","r","gl","gd"]
 # possSym = [1,2,3,4,6]
 # finalSym = [6]
 # possNum = [16,91]
-possSym = [1,2]
+# possSym = [1,2,3]
+possSym = [4]
 finalSym = 4
-possNum = ["letterD","letterP"]
+possNum = ["letterW","letterM"]
 
 
 # ## for two image pasting
@@ -65,13 +66,13 @@ for i in np.arange(len(possAgent)):
         for k in np.arange(len(possSym)):
             for l in np.arange(len(possColor)):
                 backgroundName = "blank_" + possAgent[i]
-
                 if possSym[k] == finalSym:
                     firstImgName = str(possNum[j]) + "_" + possColor[l]
                     newImgName = possAgent[i] + str(possNum[j]) + "_" + possColor[l]
                 else:
                     # firstImgName = "symT" + str(possSym[k]) + "_" + possColor[l]
+                    # newImgName = possAgent[i] + "sym" + str(possSym[k]) + "_" + possColor[l]
                     firstImgName = "symR" + str(possSym[k]) + "_" + possColor[l]
-                    newImgName = possAgent[i] + "sym" + str(possSym[k]+2) + "_" + possColor[l]
+                    newImgName = possAgent[i] + "sym" + str(possSym[k]) + "_" + possColor[l]
 
                 layerImages(backgroundName, firstImgName, 0, newImgName)
