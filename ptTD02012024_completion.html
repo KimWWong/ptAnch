@@ -75,7 +75,7 @@
     var runInstr = true;
     var runExpt = true;
     var runSaveData = true;
-    var runPriming = true;
+    var runPriming = false;
 
     var showAllImages = true;
 
@@ -187,7 +187,7 @@
         type: 'html-keyboard-response',
         choices: ['y'],
         stimulus: consentForm(participantType),
-        prompt: "<h3>PRESS THE Y KEY TO CONSENT</h3><p></p><p></p>",
+        prompt: "<h3>CLICK THE Y KEY ON YOUR KEYBOARD TO CONSENT</h3><p></p><p></p>",
         data: {trial_category: 'consent'}
     };
 
@@ -293,8 +293,9 @@
     /* -------- defining factors && exptdesign (*factors) --------*/
     var possAgent = ["fb"];
     // var possTableNum = ["letterD","letterP"];
-    var possTableNum = ["letterM","letterW"];
-    // var possTableNum = ["16","91"];
+    // var possTableNum = ["letterP"];
+    // var possTableNum = ["letterM","letterW"];
+    var possTableNum = ["16","91"];
     // var possColor = ["gd","gl"]
     var possColor = ["r","b"]
     var letterSharpness = 'sharp'
@@ -353,9 +354,9 @@
         // forPreload.push(stimFolder+"headphone.png");
     } else {
         forPreload.push(stimFolder+"noiseDemo.png");
-        for (var z = 0; z < possTableNum.length; z++) {
-            forPreload.push(stimFolder + "noise" + possTableNum[z] + "_" + letterSharpness + ".png");
-        }
+        // for (var z = 0; z < possTableNum.length; z++) {
+        //     forPreload.push(stimFolder + "noise" + possTableNum[z] + "_" + letterSharpness + ".png");
+        // }
     }
 
 
@@ -588,31 +589,36 @@
                 //     data.thisAcc = "Kim your letter keycodes are broken";
                 // }
                 if (data.key_press == 68) {
+                    data.letterPress = 'd'
                     if (data.thisAnchNum == 'letterD'){
                         data.thisPrimed = 1;
                     } else {
                         data.thisPrimed = 0;
                     }
                 } else if (data.key_press == 80) {
+                    data.letterPress = 'p'
                     if (data.thisAnchNum == 'letterP'){
                         data.thisPrimed = 1;
                     } else {
                         data.thisPrimed = 0;
                     }
                 } else if (data.key_press == 87) {
+                    data.letterPress = 'w'
                     if (data.thisAnchNum == 'letterW'){
                         data.thisPrimed = 1;
                     } else {
                         data.thisPrimed = 0;
                     }
                 } else if (data.key_press == 77) {
+                    data.letterPress = 'm'
                     if (data.thisAnchNum == 'letterM'){
                         data.thisPrimed = 1;
                     } else {
                         data.thisPrimed = 0;
                     }
                 }else {
-                    data.thisPrimed = "Kim your letter keycodes are broken";
+                    data.letterPress = 'unidentified'
+                    data.thisPrimed = "NA";
                 }
             } /*if answer end*/
         }, /*on trial finish end*/
@@ -626,7 +632,7 @@
 
             if (runSaveData == true){
                 saveData(workerID+"answerfiltered_data", answerfiltered.csv());
-                saveData(worker+"full_data", full.csv())
+                saveData(workerID+"full_data", full.csv())
 
                 var rand_code = hitID+String(code)+workerID;
                 var saveRandCode = {
@@ -674,8 +680,8 @@
     -------------------------------------------*/
     function loadInstrContent() {
         var instrContent = [
-            /* ind0 */'<p>Hello! Thank you for volunteering to help out with our study. Please take a moment to adjust your seating so that you can comfortably watch the monitor and use the keyboard. Feel free to dim the lights as well.</p><p>Close the door or do whatever is necessary to <b>minimize disturbance during the experiment</b>. Please also take a moment to silence your phone so that you are not interrupted by any messages mid-experiment. Do <i>not</i> switch to any other tabs or windows until you are complete.</p><p>From here on out, you will notice the arrow to continue to the next page is initially grayed out, unable to be pressed. Just wait a short while and then you will be able to proceed.</p>',
-            /* ind1 */'<p>In this experiment, you will be completing a bunch of different tasks in quick succession.</p><p>In the initial task (starting on the next page) you will see many moving dots. There is a lot of different movement, but the <b>majority of the dots</b> will be moving either <i>left or right</i>. You should <b>press the left or right arrow on your keyboard</b> to report whether more dots are moving to the left or to the right. (The dots will not stop moving until you press the left or right arrow) </p><p>When you are ready, press the "Next" button to do this <b>multiple times</>.</p>',
+            /* ind0 */'<p>Hello! Thank you for volunteering to help out with our study. Please take a moment to adjust your seating so that you can comfortably watch the monitor and use the keyboard. Feel free to dim the lights as well.</p><p>Close the door or do whatever is necessary to <b>minimize disturbance during the experiment</b>. Please also take a moment to silence your phone so that you are not interrupted by any messages mid-experiment. Do <i>not</i> switch to any other tabs or windows until you are complete.</p><p>From here on out, you will notice the arrow to continue to the next page is initially grayed out, unable to be clicked. Just wait a short while and then you will be able to proceed.</p>',
+            /* ind1 */'<p>In this experiment, you will be completing a bunch of different tasks in quick succession.</p><p>In the initial task (starting on the next page) you will see many moving dots. There is a lot of different movement, but the <b>majority of the dots</b> will be moving either <i>left or right</i>. You should <b>use the left or right arrow on your keyboard</b> to report whether more dots are moving to the left or to the right. (The dots will not stop moving until you use the left or right arrow) </p><p>When you are ready, click on the "Next" button to do this <b>multiple times</>.</p>',
         ]
         for (var i = 0; i < instrContent.length; i++){
             instrContent[i] = "<div style='display: inline-block; margin: 0 auto; padding: 10px 200px 10px 200px; text-align: left'>"+instrContent[i]+"</div>"
@@ -999,7 +1005,7 @@
         var transitiontask1 = {
             type: 'instructions',
             pages: function(){
-                var text = "<p>Great! Now for the next task. On the next page, you will see some potential logos for a new company. Use your mouse and click on which logo you think would be better for the company, given that the company hopes to come across as 'organized and professional'.</p><p>When you are ready, press the button below to see the images.</p>"
+                var text = "<p>Great! Now for the next task. On the next page, you will see some potential logos for a new company. Use your mouse and click on which logo you think would be better for the company, given that the company hopes to come across as 'organized and professional'.</p><p>When you are ready, click the button below to see the images.</p>"
                 return [text]
             },
             allow_keys: false,
@@ -1014,7 +1020,7 @@
             pages: function(){
                 /* for single object */
                 // var text = "<p>Good job! Now for the next task. Starting on the next page, you will see a series of images appear on screen. </p><p>On every image, there is going to be a table with a shape on it.  This shape on the table will be very pale in color, but it will be either slightly more <b>red</b> or more <b>blue</b>.</p><p>Your task is straightforward: Use the buttons below each image to report whether the shape on the table is more red or more blue. This task <i>will not necessarily be easy</i>, because the shape will be <i>very lightly tinted</i> in color.<p>When you are ready, press the button below to begin.</p>"
-                var text = "<p>Good job! Now for the next task. Starting on the next page, you will see a series of images appear on screen. </p><p>On every image, there is going to be a table with a shape on it.  This shape will sometimes <b>only have sharp corners</b>, but other times, it will have <b>one or more rounded corners</b>.</p><p>Your task is straightforward: Use the buttons below each image to report whether the shape on the table <i>only has sharp corners</i> or <i>has any rounded corners at all</i>. When you are ready, press the button below to begin.</p>"
+                var text = "<p>Good job! Now for the next task. Starting on the next page, you will see a series of images appear on screen. </p><p>On every image, there is going to be a table with a shape on it.  This shape will sometimes <b>only have sharp corners</b>, but other times, it will have <b>one or more rounded corners</b>.</p><p>Your task is straightforward: Use the buttons below each image to report whether the shape on the table <i>only has sharp corners</i> or <i>has any rounded corners at all</i>. When you are ready, click the button below to begin.</p>"
                 /* for double object */
                 // if (inanimateList.includes(thisAgent)) {
                 //     var up = "trashcan"
@@ -1077,10 +1083,11 @@
         var wordCompletion = {
             type: 'html-keyboard-response',
             stimulus: function(){
-                var text = "<p>Great, now fill in the blank! Type one letter on your keyboard to complete the word below (the letter must be a <i>consonsant</i>) :</p>"
+                // var text = "<p>Great, now fill in the blank! Type one letter on your keyboard to complete the word below (the letter must be a <i>consonsant</i>) :</p>"
+                var text = "<p>Great, now fill in the blank! Without looking it up, type one letter on your keyboard to complete the word below:</p>"
                 // var prime = "<p style='font-size:3.0vh'> <b>_</b> o o r</p>"
                 // var prime = "<p style='font-size:3.0vh'>l i <b>_</b></p>"
-                var prime = "<p style='font-size:3.0vh'><b>_</b> A T C H</p>"
+                var prime = "<p style='font-size:3.0vh'><b>_</b> r e s s i n g</p>"
                 return text+prime
             },
             choices: ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"],

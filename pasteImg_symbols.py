@@ -5,20 +5,20 @@ import numpy as np
 readFolder = "stimuli_sideview/"
 outFolder = "stimuli_sideview/auto/"
 
+
 def layerImages(backgroundImg, firstLayerImg, secondLayerImg, newImgName):
     baseImg = Image.open(readFolder + backgroundImg + ".png")
     baseImg = baseImg.convert("RGBA")
     # old_width, old_height = img.size
     # print(baseImg.size)
 
-    firstImg = Image.open(readFolder + firstLayerImg + '.png')
+    firstImg = Image.open(readFolder + firstLayerImg + ".png")
     firstImg = firstImg.convert("RGBA")
     # print(mondImg.size)
 
     if secondLayerImg != 0:
-        secondImg = Image.open(readFolder + secondLayerImg + '.png')
-        secondImg= secondImg.convert("RGBA")
-
+        secondImg = Image.open(readFolder + secondLayerImg + ".png")
+        secondImg = secondImg.convert("RGBA")
 
     # baseImg.paste(blockImg, (250,100), blockImg)
     baseImg.paste(firstImg, (0, 0), firstImg)
@@ -28,15 +28,16 @@ def layerImages(backgroundImg, firstLayerImg, secondLayerImg, newImgName):
 
     baseImg.save(outFolder + newImgName + ".png", "PNG")
 
-possAgent = ["fb","f"]
-possColor = ["b","r","gl","gd"]
+
+possAgent = ["fb", "f"]
+possColor = ["b", "r", "gl", "gd"]
 # possSym = [1,2,3,4,6]
 # finalSym = [6]
 # possNum = [16,91]
 # possSym = [1,2,3]
 possSym = [4]
 finalSym = 4
-possNum = ["letterW","letterM"]
+possNum = [16, 91]
 
 
 # ## for two image pasting
@@ -73,6 +74,8 @@ for i in np.arange(len(possAgent)):
                     # firstImgName = "symT" + str(possSym[k]) + "_" + possColor[l]
                     # newImgName = possAgent[i] + "sym" + str(possSym[k]) + "_" + possColor[l]
                     firstImgName = "symR" + str(possSym[k]) + "_" + possColor[l]
-                    newImgName = possAgent[i] + "sym" + str(possSym[k]) + "_" + possColor[l]
+                    newImgName = (
+                        possAgent[i] + "sym" + str(possSym[k]) + "_" + possColor[l]
+                    )
 
                 layerImages(backgroundName, firstImgName, 0, newImgName)

@@ -12,6 +12,7 @@
     <script src="../jspsych-6.1.0/plugins/jspsych-image-keyboard-response.js"></script>
     <script src="../jspsych-6.1.0/plugins/jspsych-html-button-response.js"></script>
     <script src="../jspsych-6.1.0/plugins/jspsych-html-button-responseHTML.js"></script>
+    <script src="../jspsych-6.1.0/plugins/jspsych-html-button-responseHTMLvert.js"></script>
     <script src="../jspsych-6.1.0/plugins/jspsych-html-slider-response.js"></script>
     <script src="../jspsych-6.1.0/plugins/jspsych-survey-html-form.js"></script>
     <script src="../jspsych-6.1.0/plugins/jspsych-survey-html-timer.js"></script>
@@ -110,8 +111,8 @@
     var ISI_DURATION = 500
 
 
-    var estTotalRunTime = 5
-    var estDollars = 0.70
+    var estTotalRunTime = 3
+    var estDollars = 0.42
 
     var timelinebase = [];
     var forPreload = [];
@@ -308,7 +309,7 @@
     */
 
     /* -------- defining factors && exptdesign (*factors) --------*/
-    var possAgent = ["m","mb"];
+    var possAgent = ["m"];
     var possTableNum = [16,91];
     // var possTableNum = [16];
     var possProbePos = ["R","L"]
@@ -329,8 +330,8 @@
     randTableNumIndex = Math.floor(Math.random() * possTableNum.length);
 
     // var positionForcing = 'forcenumberlineConsistency'
-    var positionForcing = 'forcePTnumberlineConsistency'
-    // var positionForcing = ''
+    // var positionForcing = 'forcePTnumberlineConsistency'
+    var positionForcing = ''
 
     if (positionForcing == 'forcenumberlineConsistency'){
         if (possTableNum[randTableNumIndex] < 50){
@@ -402,9 +403,9 @@
         for (var elem = 0; elem < 1; elem++){ /* normally its elem < 1 for single trial */
 
             // console.log(full_design[elem])
-            var thisRotate = jsPsych.randomization.sampleWithReplacement(possRotate, 1)[0];
-            var thisFlip = jsPsych.randomization.sampleWithReplacement(possFlip, 1) [0];
-            var thisProbeType = jsPsych.randomization.sampleWithoutReplacement(possProbeType, 1)[0];
+            var thisRotate = shuffle(possRotate)[0];
+            var thisFlip = shuffle(possFlip) [0];
+            var thisProbeType = shuffle(possProbeType)[0];
             // runSingleTrial(full_design[elem].agent, full_design[elem].tableNum, full_design[elem].probePos, thisProbeType, timelinebase, 'expt');
             runSingleTrial(possAgent[randAgentIndex], possTableNum[randTableNumIndex], thisProbePos, thisProbeType, timelinebase, 'expt');
 
@@ -448,7 +449,35 @@
     var debrief_original = {
         type: 'survey-html-form',
         html: debriefForm(),
-        data: {trial_category: 'debrief_original'}
+        data: {trial_category: 'debrief_original'},
+        clock: function(){
+                var endTime = new Date().toLocaleString("en-US", {timeZone: "America/New_York"});
+                endTime = new Date(endTime);
+                console.log('End Time'+endTime.toLocaleString())
+                return endTime
+        },
+        on_finish: function(){
+            var full= jsPsych.data.get().filterCustom(function(trial){
+                return trial.trial_category != "answer_instr";
+            })
+            // jsPsych.data.displayData('csv');
+            var answerfiltered = jsPsych.data.get().filter({trial_category: "answer"})
+            var taskfiltered = jsPsych.data.get().filter({trial_category: "task", thispShow: "all"})
+            // console.log(answerfiltered.csv());
+
+            if (runSaveData == true){
+                saveData(participantID+"answerfiltered_data", answerfiltered.csv());
+                saveData(participantID+"full_data", full.csv())
+                saveData(participantID+"taskfiltered_data", taskfiltered.csv());
+
+                var rand_code = hitID+String(code)+participantID;
+                var saveRandCode = {
+                    'savetocsv': 'workerCreditCodes', //filename to save the data with
+                    'curData': participantID+','+hitID+','+assignmentID+','+rand_code// data to save
+                    }
+                myPostData('mySave.php', saveRandCode);
+            } /*if runSaveData end*/
+        } /*on finish end*/
     }
 
 
@@ -550,8 +579,8 @@
 
     if (runDebrief == true) {
         timelinebase.push(debrief_original);
-        timelinebase.push(debrief_rememberAny);
-        timelinebase.push(debrief_confidence);
+        // timelinebase.push(debrief_rememberAny);
+        // timelinebase.push(debrief_confidence);
     }
     timelinebase.push({type: 'fullscreen', fullscreen_mode: false});
     timelinebase.push(closing);
@@ -622,6 +651,19 @@
     ===============================================================
     */
 
+    function shuffle(array) {
+        let currentIndex = array.length,  randomIndex;
+        // While there remain elements to shuffle.
+        while (currentIndex > 0) {
+        // Pick a remaining element.
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+        // And swap it with the current element.
+            [array[currentIndex], array[randomIndex]] = [
+              array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
 
     /* ----------------------------------------
      Functions for text: instructions, debrief, consent, and id form entry (*fxtext)
@@ -651,12 +693,12 @@
             var consentContent = "<h5>USE ARROW KEYS TO SCROLL DOWN, AND PRESS 'Y' TO CONSENT.<br>In order to run this study, we need to include the standard consent form below.</h5><h1>Consent for Participation in a Research Study</h1><div style='width: 100%; text-align: center'><div style='display: inline-block; margin: auto; padding: 10px 200px 10px 200px; text-align: left'><h5>STUDY TITLE</h5><p>Testing reaction time and your judgement abilities</p>"+
             "<h5>RESEARCH STUDY SUMMARY, RISKS, AND BENEFITS</h5><p>Thank you for volunteering to participate in this research study. The purpose of this study is to better understand how we see and how we think. Study activities will include examining simple displays and then responding by answering questions, pressing some keys, or using a computer mouse. Because these are activities that many people already experience hundreds or thousands of times every day, there are no risks involved in this study. The study may have no benefits to you, but it may help the scientific community come to better understand how the human mind works. Taking part in this study is your choice. You can choose to take part, or you can choose not to take part in this study. You can also change your mind at any time, with no penalty.</p><h5>DURATION</h5><p>If you agree to take part, the study will last approximately <strong> "+String(estTotalRunTime)+" minutes</strong>.</p>"+
             "<h5>COSTS AND COMPENSATION</h5><p>There are no costs associated with participation in this study. You will receive <strong>"+String(0.5)+" credits</strong> for participating.</p><h5>CONFIDENTIALITY</h5><p>No personally identifying information will be collected, so your participation will be anonymous. The survey is anonymous. We will not know your name. We will not be able to connect any identifying information to your survey answers. However, we will know your mTurk number in order to pay you for your time. We will keep the information about your participation in this research confidential. Your data will be pooled with those from other participants, and may be included in scientific publications and uploaded to public data repositories.</p>"+
-            "<h5>LEARNING MORE</h5><p>If you have questions about this study, you may contact your experimenters Kimberly Wong at kimberly.wong@yale.edu or Huichao Ji at huichao.ji@yale.edu. If you have questions about your rights as a research participant, or you have complaints about this research, you can contact the Yale Institutional Review Boards at 203-785-4688 or hrpp@yale.edu.</p><h5>INFORMED CONSENT</h5><p>Your participation indicates that you have read and understood this consent form and the information presented and that you agree to be in this study.</p></div></div>"
+            "<h5>LEARNING MORE</h5><p>If you have questions about this study, you may contact your experimenter Huichao Ji at huichao.ji@yale.edu. If you have questions about your rights as a research participant, or you have complaints about this research, you can contact the Yale Institutional Review Boards at 203-785-4688 or hrpp@yale.edu.</p><h5>INFORMED CONSENT</h5><p>Your participation indicates that you have read and understood this consent form and the information presented and that you agree to be in this study.</p></div></div>"
         } else {
             var consentContent = "<h5>USE ARROW KEYS TO SCROLL DOWN, AND PRESS 'Y' TO CONSENT.<br>In order to run this study, we need to include the standard consent form below.</h5><h1>Consent for Participation in a Research Study</h1><div style='width: 100%; text-align: center'><div style='display: inline-block; margin: auto; padding: 10px 200px 10px 200px; text-align: left'><h5>STUDY TITLE</h5><p>Testing reaction time and your judgement abilities</p>"+
             "<h5>RESEARCH STUDY SUMMARY, RISKS, AND BENEFITS</h5><p>Thank you for volunteering to participate in this research study. The purpose of this study is to better understand how we see and how we think. Study activities will include examining simple displays and then responding by answering questions, pressing some keys, or using a computer mouse. Because these are activities that many people already experience hundreds or thousands of times every day, there are no risks involved in this study. The study may have no benefits to you, but it may help the scientific community come to better understand how the human mind works. Taking part in this study is your choice. You can choose to take part, or you can choose not to take part in this study. You can also change your mind at any time, with no penalty.</p><h5>DURATION</h5><p>If you agree to take part, the study will last approximately <strong> "+String(estTotalRunTime)+" minutes</strong>.</p>"+
             "<h5>COSTS AND COMPENSATION</h5><p>There are no costs associated with participation in this study. You will receive <strong>"+String(estDollars)+" dollars</strong> for participating.</p><h5>CONFIDENTIALITY</h5><p>No personally identifying information will be collected, so your participation will be anonymous. The survey is anonymous. We will not know your name. We will not be able to connect any identifying information to your survey answers. However, (if you are accessing this experiment through mTurk), we will know your mTurk number in order to pay you for your time. Your mTurk number could possibly be connected to your public profile, which could, in theory, be searched. We want to stress that we will not be looking at anyone's public profiles. We will keep the information about your participation in this research confidential. Your data will be pooled with those from other participants, and may be included in scientific publications and uploaded to public data repositories.</p>"+
-            "<h5>LEARNING MORE</h5><p>If you have questions about this study, you may contact your experimenters Kimberly Wong at kimberly.wong@yale.edu or Huichao Ji at huichao.ji@yale.edu. If you have questions about your rights as a research participant, or you have complaints about this research, you can contact the Yale Institutional Review Boards at 203-785-4688 or hrpp@yale.edu.</p><h5>INFORMED CONSENT</h5><p>Your participation indicates that you have read and understood this consent form and the information presented and that you agree to be in this study.</p></div></div>"
+            "<h5>LEARNING MORE</h5><p>If you have questions about this study, you may contact your experimenter Huichao Ji at huichao.ji@yale.edu. If you have questions about your rights as a research participant, or you have complaints about this research, you can contact the Yale Institutional Review Boards at 203-785-4688 or hrpp@yale.edu.</p><h5>INFORMED CONSENT</h5><p>Your participation indicates that you have read and understood this consent form and the information presented and that you agree to be in this study.</p></div></div>"
         }
 
         consentContent = "<div style='font-size: 2.6vh;'>"+consentContent+"</div>"
@@ -725,7 +767,7 @@
     function gabor_confidence() {
         var Gabor_confidence =
         "<div style='width: 50%; text-align: left; margin: auto'>" +
-        '<p>Using the slider below, on a scale of 1-10 (with 1 being not confident at all, and 10 being very confident), how confident are you that you submitted the correct tilt of the stripes? (This will not affect whether you receive credit or compensation.) <br> <p style="text-align:left;">Not confident at all <span style="float:right;">Very Confident</span></p> <input type="range" value="4" min="1" max="10" name = "gabor_confidence" class="slider" style="width:100%" required oninput="this.nextElementSibling.value = this.value"> <output id = "letter_confidence_out"  style="text-align:center">_</output> </p>' +
+        '<p>Using the slider below, on a scale of 1-10 (with 1 being not confident at all, and 10 being very confident), how confident are you that you submitted the correct tilt of the stripes? (This will not affect whether you receive credit or compensation.) <br> <p style="text-align:left;">Not confident at all <span style="float:right;">Very Confident</span></p> <input type="range" value="5" min="1" max="10" name = "gabor_confidence" class="slider" style="width:100%" required oninput="this.nextElementSibling.value = this.value"> <output id = "letter_confidence_out"  style="text-align:center">_</output> </p>' +
         "</div>"
         return Gabor_confidence
     };
@@ -875,18 +917,10 @@
 
 
         var logoTask = {
-            type: "html-button-response2",
-            stimulus: "Click on the logo that you would choose for this company that wants to appear 'organized and professional'.",
+            type: "html-button-response-vert",
+            stimulus: "Click on the logo that you think would be better for this company that wants to appear 'organized and professional'.",
             choices: function(){
-                var logoWidth = 400;
-                var w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-                if (logoWidth > ((w/2)-200) ){
-                    console.log("TOO BIG")
-                    var afcimgWidth = (w/2)-100
-                } else {
-                    var afcimgWidth = logoWidth
-                }
-
+                var afcimgWidth = 200;
                 var stimContent = []
                 stimContent.push("<img src='"+stimFolder+"logoY.png' width='"+String(afcimgWidth)+"' />");
                 stimContent.push("<img src='"+stimFolder+"logoS.png' width='"+String(afcimgWidth)+"' />");

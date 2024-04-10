@@ -2,10 +2,24 @@
 data/
 editing/
 temp/
+old/
 stimuli**/
 stimuli/
+img_zip_files/
+workerCreditCodes.csv
+docxNotes
+
+# JetBrains
+.idea/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Specific to expt
 fromJoan/
 perspective taking-20230215T060449Z-001/
-perspective taking-20230215T060449Z-001.zip
+img_zip_files/perspective taking-20230215T060449Z-001.zip
 images_colorful squares-20230627T204235Z-001/
-images**
+images**/
