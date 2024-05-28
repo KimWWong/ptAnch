@@ -13,6 +13,9 @@ docxNotes
 .idea/
 .idea
 
+# formatting
+.prettierrc
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
