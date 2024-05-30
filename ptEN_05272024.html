@@ -67,12 +67,12 @@
 
 
     var inanimateList = ['t'] // side view doesn't have trashcan version yet, just female
-    var imgWidth = 1000*0.75
-    var imgHeight = 740*0.75
+    var imgWidth = 1147*0.75
+    var imgHeight = 700*0.75
 
 
     var ISI_DURATION = 500;
-    var DISC_DISP_TIME = 1200;
+    var DISC_DISP_TIME = 1000;
 
     var estTotalRunTime = 2;
     var estDollars = 0.30;
@@ -86,7 +86,7 @@
     var participantType = 'prolific'; // either 'mturk' or 'prolific'
     // var participantType = 'mturk';
     // var participantType = 'sona'
-    var prolific_url = 'https://app.prolific.co/submissions/complete?cc=120AE35A';
+    var prolific_url = 'https://app.prolific.co/submissions/complete?cc=130AE35A';
 
     var w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
     var h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
@@ -270,7 +270,8 @@
     */
 
     /* -------- defining factors && exptdesign (*factors) --------*/
-    var possAgent = ["fL", "fR"];
+    // var possAgent = ["fL", "fR"];
+    var possAgent = ["fRnw"];
     var possTableNum = ["18L12R","12L18R"];
 
     var possRotate = [0];
@@ -586,7 +587,7 @@
             var rand_code = hitID+String(code)+workerID;
             var addition = "<p>Here is your <b>unique</b> code: "+rand_code+"</p><p>To recieve payment for this experiment, you must take this code back to the page that directed you here. Enter the code into the box there. If you encounter problems during this step, please contact the email above.";
         } else if (participantType == 'prolific'){
-            var addition = "<p>For your convenience, you will find your completion code in a new tab <b>after you press the Spacebar</b>. Alternatively, here is the code for you to enter manually: <b>120AE35A</b>. If you encounter any problems during this step, please contact the email above."
+            var addition = "<p>For your convenience, you will find your completion code in a new tab <b>after you press the Spacebar</b>. Alternatively, here is the code for you to enter manually: <b>130AE35A</b>. If you encounter any problems during this step, please contact the email above."
         } else if (participantType == 'sona'){
             var addition = "<p>If you're interested in learning more about this experiment, please see the following google doc, and do not hesitate to reach out! Thank you for participating.</p><p>https://docs.google.com/document/d/1WxqXB8pD6Fv7XpP7IS3HsYDqlxJ-yT4M/edit?usp=sharing&ouid=109087269691106150998&rtpof=true&sd=true</p>"
         }
