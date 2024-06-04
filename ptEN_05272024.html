@@ -67,12 +67,12 @@
 
 
     var inanimateList = ['t'] // side view doesn't have trashcan version yet, just female
-    var imgWidth = 1147*0.75
-    var imgHeight = 700*0.75
+    var imgWidth = 1147*0.80
+    var imgHeight = 700*0.80
 
 
     var ISI_DURATION = 500;
-    var DISC_DISP_TIME = 1000;
+    var DISC_DISP_TIME = 1500;
 
     var estTotalRunTime = 2;
     var estDollars = 0.30;
@@ -271,7 +271,7 @@
 
     /* -------- defining factors && exptdesign (*factors) --------*/
     // var possAgent = ["fL", "fR"];
-    var possAgent = ["fRnw"];
+    var possAgent = ["fR"];
     var possTableNum = ["18L12R","12L18R"];
 
     var possRotate = [0];
@@ -742,6 +742,7 @@
                     image_h: imgHeight,
                     thisFlip: divFlip,
                     thisRotate: divRotation,
+                    dispTime: DISC_DISP_TIME,
                 },
             }
             return enumeration
@@ -777,13 +778,25 @@
 
         var count_discs = {
             type: 'survey-html-form',
-            preamble: '<p>How many black discs were there on the table? (Give your best, most precise guess!)</p>',
+            preamble: '<p>How many black discs were there on the table in total? (Give your best, most precise guess!)</p>',
             html: '<p><input type="number" id="count_discs" name="response" size="10" /> black discs</p>',
             autofocus: 'count_discs',
             // data: {trial_category:"anchor_suitcase"}
             data: {trial_category:"answer"+append,
                 thisAgent: thisAgent,
-                thisTableNum: thisTableNum}
+                thisTableNum: thisTableNum,
+                dispTime: DISC_DISP_TIME,}
+        }
+
+        var isiBlank = {
+            type: 'html-keyboard-response',
+            stimulus: '',
+            choices: jsPsych.NO_KEYS,
+            trial_duration: ISI_DURATION,
+            data: {
+                trial_category: "imgDisp" + append,
+                dispTime: ISI_DURATION,
+            },
         }
 
 
@@ -810,8 +823,12 @@
             timelineTrialsToPush.push(logoTask);
         }
         timelineTrialsToPush.push(transitiontask2);
+        timelineTrialsToPush.push(cursor_off);
+        timelineTrialsToPush.push(isiBlank);
         timelineTrialsToPush.push(enumerate(thisAgent, thisTableNum, imgWidth, imgHeight, divFlip, divRotation));
+        timelineTrialsToPush.push(cursor_on);
         timelineTrialsToPush.push(count_discs);
+
 
     } /* run single trial end */
 
