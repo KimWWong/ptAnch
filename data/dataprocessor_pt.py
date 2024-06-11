@@ -12,7 +12,7 @@ from analysis_utils import AnalysisUtils as au
 def main():
 
     # folderName = PathUtils.get_curr_path() + "/04102024_anchSide2/"
-    folderName = PathUtils.get_curr_path() + "/05312024_en3_1500_fR/"
+    folderName = PathUtils.get_curr_path() + "/06062024_en4_600_sep500/"
 
     debriefType = "none"  ## seq or none, if there is extended debrief or not
     trialScreenCriteria = "2SDentiredataset"  ## 2SDentiredataset, 2SDindividual, boths

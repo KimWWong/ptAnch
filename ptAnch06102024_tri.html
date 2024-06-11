@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ptEN Study</title>
+    <title>ptAnch Study</title>
     <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> -->
     <script src="../jspsych-6.1.0/jspsych.js"></script>
     <!-- <script src="../jspsych-6.1.0/plugins/jspsych-instructions-delay.js"></script> -->
@@ -20,7 +20,7 @@
     <script src="../jspsych-6.1.0/plugins/jspsych-call-function.js"></script>
     <!-- <script src="../jspsych-6.1.0/plugins/jo-show-maze-trace-resp.js"></script> -->
     <script src="../jspsych-6.1.0/plugins/kw-show-click-adj.js"></script>
-    <script src="../jspsych-6.1.0/plugins/jspsych-rdk2.js"></script>
+    <script src="../jspsych-6.1.0/plugins/jspsych-rdk.js"></script>
     <script src="../jspsych-6.1.0/plugins/rw-html-slider-response.js"></script>
     <script src="../jspsych-6.1.0/plugins/jspsych-survey-text.js"></script>
 
@@ -35,7 +35,10 @@
 <body>
     <script>
 
-    // 05.07.2024 - took ptTD02012024_completion to make this version where we don't show the initial trials, but ask for enumeration.
+    // 02.20.2023 - took ullObs code and adapted it for pt study
+    // 02.22.2023 - combining both Huichao instructions section with click module.
+    // 09.04.2023 - new randomization method
+    // 10.10.2023 - updated to match ptNL's new images and click-show
 
     /*
     ===============================================================
@@ -57,26 +60,32 @@
     ===============================================================
     */
 
-    var stimFolder = 'stimuli_wall/'
+    var stimFolder = 'stimuli/'
+    // var stimFolder = 'stimuli_newsetup/'
+
 
     var runIntro = true;
     var runInstr = true;
     var runExpt = true;
     var runSaveData = true;
-    var runDistractorTasks = false;
+
+    // var imgWidth = 500
+    // var imgHeight = 370
+    // var imgWidth = 500*(1.2)
+    // var imgHeight = 370*(1.2)
+    var imgWidth = 1000*0.75
+    var imgHeight = 740*0.75
 
 
-    var inanimateList = ['t'] // side view doesn't have trashcan version yet, just female
-    var imgWidth = 1147*0.80
-    var imgHeight = 700*0.80
+    // var PREPROBE_DISP_TIME = 800
+    // var COREPROBE_DISP_TIME = 650
+    // var ALLPROBES_DISP_TIME = 2000
+    var ISI_DURATION = 500
 
 
-    var ISI_DURATION = 200;
-    var ISI_NODOTS_DISPTIME = 500;
-    var DISC_DISP_TIME = 600;
 
-    var estTotalRunTime = 2;
-    var estDollars = 0.30;
+    var estTotalRunTime = 3
+    var estDollars = 0.42
 
 
     var timelinebase = [];
@@ -84,10 +93,10 @@
     var full_check = false;
 
     //participant information extraction from URL
-    var participantType = 'prolific'; // either 'mturk' or 'prolific'
+    var participantType = 'prolific'; // either 'mturk' or 'pOrolific'
     // var participantType = 'mturk';
     // var participantType = 'sona'
-    var prolific_url = 'https://app.prolific.co/submissions/complete?cc=130AE35A';
+    var prolific_url = 'https://app.prolific.co/submissions/complete?cc=2D8B06CB';
 
     var w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
     var h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
@@ -105,20 +114,24 @@
     var code = jsPsych.randomization.randomID(10);
 
     if (participantType == 'mturk'){
+        var participantID;
         var workerID = getURLParameter('workerId');
         var hitID = getURLParameter('hitId');
         var assignmentID = getURLParameter('assignmentId');
         console.log(workerID, hitID, assignmentID);
     } else if (participantType == 'prolific'){
+        var participantID;
         var workerID = getURLParameter('PROLIFIC_PID');
         var hitID = getURLParameter('STUDY_ID');
         var assignmentID = getURLParameter('SESSION_ID');
         console.log(workerID, hitID, assignmentID);
     } else if (participantType == 'sona'){
+        var participantID;
         var workerID = getURLParameter('sona_id');
         var hitID = getURLParameter('testing_hitID');
         var assignmentID = getURLParameter('testing_assignmentID');
     } else {
+        var participantID = 'testing_pID';
         var workerID = 'testingworker_ID';
         var hitID = 'testing_hitID';
         var assignmentID = 'testing_assignmentID';
@@ -167,7 +180,7 @@
         type: 'html-keyboard-response',
         choices: ['y'],
         stimulus: consentForm(participantType),
-        prompt: "<h3>CLICK THE Y KEY ON YOUR KEYBOARD TO CONSENT</h3><p></p><p></p>",
+        prompt: "<h3>PRESS THE Y KEY TO CONSENT</h3><p></p><p></p>",
         data: {trial_category: 'consent'}
     };
 
@@ -182,15 +195,15 @@
                 var insert = participantType + " ID"
             }
             if (workerID == 'no_query'){
-                text +="<p>Please provide your "+insert+":</p><br><input required='true' name='numberID' type='text' size='70' />"
+                text +="<p>Please provide your "+insert+":</p><br><input required='true' name='numberID' type='text' size='100' />"
                 // text +="<p>Please provide your "+participantType+" ID:</p><br><input required='true' name='numberID' type='text' size='100' />"
             } else if (workerID != undefined){
                 console.log(workerID)
-                text +="<p>Please provide your "+insert+":</p><br><input required='true' name='numberID' type='text' value='"+String(workerID)+"' size='70' />"
+                text +="<p>Please provide your "+insert+":</p><br><input required='true' name='numberID' type='text' value='"+String(workerID)+"' size='100' />"
                 // text +="<p>Please provide your "+participantType+" ID:</p><br><input required='true' name='numberID' type='text' value="+String(workerID)+" size='100' />"
             } else {
                 console.log("code is not working")
-                text +="<p>Please provide your "+insert+":</p><br><input required='true' name='numberID' type='text' size='70' />"
+                text +="<p>Please provide your "+insert+":</p><br><input required='true' name='numberID' type='text' size='100' />"
                 // text +="<p>Please provide your "+participantType+" ID:</p><br><input required='true' name='numberID' type='text' size='100' />"
             }
             text +="<p>(Note: Depending on the way you accessed this link, you may find that your ID is already entered into the box for your convenience, but please double check if this number is correct before proceeding.)</p>"
@@ -201,14 +214,13 @@
         on_finish: function(data) {
             var respObj = JSON.parse(data.responses);
             for (var key in respObj) {
-                if (respObj[key] == workerID){
+                if (respObj[key] == participantID){
                     console.log("The manual type matches the query capture, going with query input.");
-                } else if (workerID == 'no_query'){
-                    console.log("The query was not successfully captured, or there was nothing to query, going with manual input.");
-                    workerID = respObj[key];
+                } else if (participantID = 'no_query'){
+                    console.log("The Query was not successfully captured, going with manual input.");
+                    participantID = respObj[key];
                 } else {
                     console.log("The manual type differed from the query capture, going with query capture.")
-                    workerID = respObj[key];
                 }
             }  /*end of for loop*/
         } /*end of on_finish*/
@@ -244,7 +256,7 @@
     ===============================================================
     */
 
-    var instrContent = loadInstrContent(runDistractorTasks);
+    var instrContent = loadInstrContent();
 
     if (runInstr == true){
         for (var slide = 0; slide < instrContent.length; slide++){
@@ -254,7 +266,7 @@
                 allow_keys: false,
                 allow_backward: false,
                 show_clickable_nav: true,
-                button_delay: 3000,
+                button_delay: 2000,
                 data: {trial_category: 'instruction'}
             }
 
@@ -271,41 +283,57 @@
     */
 
     /* -------- defining factors && exptdesign (*factors) --------*/
-    // var possAgent = ["fL", "fR"];
-    var possAgent = ["fR","fRnw"];
-    var possTableNum = ["18L12R","12L18R"];
+    var possAgent = ["f",'lz'];
+    var possTableNum = [16,91];
 
     var possRotate = [0];
     var possFlip = ['n'];
-    var possSym = [1,2,3,4]
+    var possProbe = [0,1,2]
 
 
     /*new randomization method*/
     randAgentIndex = Math.floor(Math.random() * possAgent.length);
     randTableNumIndex = Math.floor(Math.random() * possTableNum.length);
 
-    var thisAgent = possAgent[randAgentIndex];
-    var thisAnchNum = String(possTableNum[randTableNumIndex]);
+    /*old randomization method*/
+    // var factors = {
+    //     agent: possAgent,
+    //     tableNum: possTableNum,
+    // }
+    // var full_design = jsPsych.randomization.factorial(factors, 1);
 
+    for (var i = 0; i < possAgent.length; i++){
+        for (var j = 0; j < possTableNum.length; j++){
+            forPreload.push(stimFolder+possAgent[i]+String(possTableNum[j])+".png");
+        }
+    }
 
-    forPreload.push(stimFolder + thisAgent + "_" + thisAnchNum + ".png");
-    forPreload.push(stimFolder + thisAgent + "_blank.png");
+    var tempload = possProbe
+    for (var i = 0; i < tempload.length; i++){
+        // forPreload.push(stimFolder+"probe"+String(tempload[i])+"v4.png") //for stimuli_newsetup
+        forPreload.push(stimFolder+"probe"+String(tempload[i])+".png") //for stimuli
+    }
 
-
+    forPreload.push(stimFolder+"demo500.png");
+    forPreload.push(stimFolder+"suitcase.png");
+    forPreload.push(stimFolder+"watch.png");
+    forPreload.push(stimFolder+"headphone.png");
     forPreload.push(stimFolder+"logoY.png");
     forPreload.push(stimFolder+"logoS.png");
+
 
 
     /* ------- timeline expt push (*pushExpt ) -------------- */
     if (runExpt == true){
         // for (var elem = 0; elem < full_design.length; elem++){ /* normally its elem < 1 for single trial */
         for (var elem = 0; elem < 1; elem++){ /* normally its elem < 1 for single trial */
-            var thisRotate = randomChoice(possRotate, 1)[0];
-            var thisFlip = randomChoice(possFlip, 1)[0];
-            console.log(thisFlip);
-            // var thisStim = full_design[elem].agent+String(full_design[elem].tableNum)
 
-            runSingleTrial(thisAgent, thisAnchNum, thisFlip, thisRotate, runDistractorTasks, timelinebase, 'expt')
+            var thisRotate = jsPsych.randomization.sampleWithReplacement(possRotate, 1)[0]
+            var thisFlip = jsPsych.randomization.sampleWithReplacement(possFlip, 1) [0]
+            // var thisStim = full_design[elem].agent+String(full_design[elem].tableNum)
+            var thisAgent = possAgent[randAgentIndex];
+            var thisTableNum = String(possTableNum[randTableNumIndex]);
+            runSingleTrial(thisAgent, thisTableNum, true, timelinebase, 'expt')
 
         }
 
@@ -319,43 +347,83 @@
     ===============================================================
     */
 
+    // var debrief_qs = {
+    //     type: 'survey-html-form',
+    //     html: debriefForm(),
+    //     data: {trial_category: 'debrief',
+    //         clock: function(){
+    //             var endTime = new Date().toLocaleString("en-US", {timeZone: "America/New_York"});
+    //             endTime = new Date(endTime);
+    //             console.log('End Time'+endTime.toLocaleString())
+    //             return endTime
+    //         }
+    //     },
+    //     on_finish: function(){
+    //         var postdeb= jsPsych.data.get().filterCustom(function(trial){
+    //             return trial.trial_category != "answer_instr";
+    //         })
+    //         // jsPsych.data.displayData('csv');
+    //         var answerfiltered1 = jsPsych.data.get().filter({trial_category: "answer"})
+    //         // console.log(answerfiltered.csv());
+    //
+    //         saveData(participantID+"postdeb_data", postdeb.csv())
+    //         saveData(participantID+"answerfiltered1_data", answerfiltered1.csv());
+    //     }
+    // };
+
+
     var debrief_original = {
         type: 'survey-html-form',
         html: debriefForm(),
         data: {trial_category: 'debrief_original'},
-        /*only include this on finish stuff if not doing seq afterwards*/
-        on_finish: function(){
-            var full= jsPsych.data.get().filterCustom(function(trial){
+        clock: function(){
+            var endTime = new Date().toLocaleString("en-US", {timeZone: "America/New_York"});
+            endTime = new Date(endTime);
+            console.log('End Time'+endTime.toLocaleString())
+            return endTime
+        },
+        on_start: function() {
+                    document.body.style.backgroundColor = 'white';
+                    document.body.style.textColor = 'black';
+                    document.body.style.overflow = 'scroll';
+                },
+        on_finish: function() {
+            var full = jsPsych.data.get().filterCustom(function (trial) {
                 return trial.trial_category != "answer_instr";
             })
             // jsPsych.data.displayData('csv');
             var answerfiltered = jsPsych.data.get().filter({trial_category: "answer"})
-            // var taskfiltered = jsPsych.data.get().filter({trial_category: "colorAnswer"})
+            var taskfiltered = jsPsych.data.get().filter({trial_category: "task", thispShow: "all"})
+            // console.log(answerfiltered.csv());
 
-            if (runSaveData == true){
-                saveData(workerID+"answerfiltered_data", answerfiltered.csv());
-                saveData(workerID+"full_data", full.csv());
-                // saveData(workerID+"taskfiltered_data", taskfiltered.csv());
+            if (runSaveData == true) {
+                saveData(participantID + "answerfiltered_data", answerfiltered.csv());
+                saveData(participantID + "full_data", full.csv())
+                saveData(participantID + "taskfiltered_data", taskfiltered.csv());
 
-                var rand_code = hitID+String(code)+workerID;
+                var rand_code = hitID + String(code) + participantID;
                 var saveRandCode = {
                     'savetocsv': 'workerCreditCodes', //filename to save the data with
-                    'curData': workerID+','+hitID+','+assignmentID+','+rand_code// data to save
-                    }
+                    'curData': participantID + ',' + hitID + ',' + assignmentID + ',' + rand_code// data to save
+                }
                 myPostData('mySave.php', saveRandCode);
             } /*if runSaveData end*/
         }
-    }
+    } // deb_original end
 
     var debrief_rememberAny={
         type: 'survey-text',
         questions:[
-            {prompt:"<div style='width: 70%; text-align: left; margin: 0 auto'>" +'</p>In the task where you had to determine the color of the shape on the table, can you remember anything about what those shapes on the table were? Please type down any shapes you remember.</p>', required: true}
-
+            // {prompt:"<div style='width: 70%; text-align: left; margin: 0 auto'>" +'</p>In the task where you had to click on blue rectangles, there were other things on the black table. In 1-2 sentences, please tell us anything you remember about what they were.</p>', required: true}
+            {prompt:"<div style='width: 70%; text-align: left; margin: 0 auto'>" +'</p>In the task where you had to click on white triangles, there were other things on the black table. In 1-2 sentences, please tell us anything you remember about what they were.</p>', required: true}
         ],
         data: {trial_category: 'debrief_rememberAny'}
     }
 
+    // var debrief_rememberAny = {
+    //     type: 'survey-html-form',
+    //
+    // }
 
     var debrief_confidence = {
         type: 'survey-html-form',
@@ -377,24 +445,45 @@
             var full= jsPsych.data.get().filterCustom(function(trial){
                 return trial.trial_category != "answer_instr";
             })
+            // jsPsych.data.displayData('csv');
             var answerfiltered = jsPsych.data.get().filter({trial_category: "answer"})
-            // var taskfiltered = jsPsych.data.get().filter({trial_category: "colorAnswer"})
-
+            var taskfiltered = jsPsych.data.get().filter({trial_category: "task", thispShow: "all"})
+            // console.log(answerfiltered.csv());
 
             if (runSaveData == true){
-                saveData(workerID+"answerfiltered_data", answerfiltered.csv());
-                saveData(workerID+"full_data", full.csv())
-                // saveData(workerID+"taskfiltered_data", taskfiltered.csv());
+                saveData(participantID+"answerfiltered_data", answerfiltered.csv());
+                saveData(participantID+"full_data", full.csv())
+                saveData(participantID+"taskfiltered_data", taskfiltered.csv());
 
-                var rand_code = hitID+String(code)+workerID;
+                var rand_code = hitID+String(code)+participantID;
                 var saveRandCode = {
                     'savetocsv': 'workerCreditCodes', //filename to save the data with
-                    'curData': workerID+','+hitID+','+assignmentID+','+rand_code// data to save
+                    'curData': participantID+','+hitID+','+assignmentID+','+rand_code// data to save
                     }
                 myPostData('mySave.php', saveRandCode);
             } /*if runSaveData end*/
         }
     };
+
+    // var closing = {
+    //     type: 'html-keyboard-response',
+    //     stimulus: closingText(participantType),
+    //     choices: ['Spacebar'],
+    //     data: {trial_category: 'closing'},
+    //     on_start: function(){
+    //         if (participantType == 'mturk'){
+    //             jsPsych.endExperiment()
+    //         } else if (participantType == 'prolific'){
+    //             console.log("this is a prolific participant")
+    //         }
+    //     }, /* end of closing on start function */
+    //     on_finish: function(){
+    //         if (participantType == 'prolific'){
+    //             window.open(prolific_url, '_blank')
+    //         }
+    //         jsPsych.endExperiment()
+    //     }
+    // };
 
 
     // new closing module
@@ -465,13 +554,13 @@
             // console.log(answerfiltered.csv());
 
             if (runSaveData == true){
-                saveData(workerID+"answerfiltered_data", answerfiltered.csv());
-                saveData(workerID+"full_data", full.csv())
+                saveData(participantID+"answerfiltered_data", answerfiltered.csv());
+                saveData(participantID+"full_data", full.csv())
 
-                var rand_code = hitID+String(code)+workerID;
+                var rand_code = hitID+String(code)+participantID;
                 var saveRandCode = {
                     'savetocsv': 'workerCreditCodes', //filename to save the data with
-                    'curData': workerID+','+hitID+','+assignmentID+','+rand_code// data to save
+                    'curData': participantID+','+hitID+','+assignmentID+','+rand_code// data to save
                     }
                 myPostData('mySave.php', saveRandCode);
             }
@@ -486,39 +575,15 @@
     ===============================================================
     */
 
-    function shuffle(array) {
-        let currentIndex = array.length,  randomIndex;
-        // While there remain elements to shuffle.
-        while (currentIndex > 0) {
-        // Pick a remaining element.
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex--;
-        // And swap it with the current element.
-            [array[currentIndex], array[randomIndex]] = [
-              array[randomIndex], array[currentIndex]];
-        }
-        return array;
-    }
-
-    function randomChoice(array, numChoices) {
-        var shuffledArray = shuffle(array);
-        var selectedItems = [];
-        for (var s = 0; s < numChoices; s++) {
-            selectedItems.push(shuffledArray[s]);
-        }
-    return selectedItems
-}
 
     /* ----------------------------------------
      Functions for text: instructions, debrief, consent, and id form entry (*fxtext)
     -------------------------------------------*/
-    function loadInstrContent(runDistractorTasks) {
+    function loadInstrContent() {
         var instrContent = [
-            /* ind0 */'<p>Hello! Thank you for volunteering to help out with our study. Please take a moment to adjust your seating so that you can comfortably watch the monitor and use the keyboard. Feel free to dim the lights as well.</p><p>Close the door or do whatever is necessary to <b>minimize disturbance during the experiment</b>. Please also take a moment to silence your phone so that you are not interrupted by any messages mid-experiment. Do <i>not</i> switch to any other tabs or windows until you are complete.</p><p>From here on out, you will notice the arrow to continue to the next page is initially grayed out, unable to be clicked. Just wait a short while and then you will be able to proceed.</p>',
+            /* ind0 */'<p>Hello! Thank you for volunteering to help out with our study. Please take a moment to adjust your seating so that you can comfortably watch the monitor and use the keyboard. Feel free to dim the lights as well.</p><p>Close the door or do whatever is necessary to <b>minimize disturbance during the experiment</b>. Please also take a moment to silence your phone so that you are not interrupted by any messages mid-experiment. Do <i>not</i> switch to any other tabs or windows until you are complete.</p><p>From here on out, you will notice the arrow to continue to the next page is initially grayed out, unable to be pressed. Just wait a short while and then you will be able to proceed.</p>',
+            /* ind1 */'<p>In this extremely short experiment, you will be performing multiple different tasks.</p><p>In the first task (on the next page) you will see many moving dots. There is a lot of different movement, but the <b>majority of the dots</b> will be moving either <i>left or right</i>. You should <b>press the left or right arrow on your keyboard</b> to report whether more dots are moving to the left or to the right. </p><p>When you are ready, press the "Next" button to begin.</p>',
         ]
-        if (runDistractorTasks == true) {
-            instrContent.push('<p>In this experiment, you will be completing a bunch of different tasks in quick succession.</p><p>In the initial task (starting on the next page) you will see many moving dots. There is a lot of different movement, but the <b>majority of the dots</b> will be moving either <i>left or right</i>. You should <b>use the left or right arrow on your keyboard</b> to report whether more dots are moving to the left or to the right. (The dots will not stop moving until you use the left or right arrow) </p><p>When you are ready, click on the "Next" button to do this <b>multiple times</>.</p>')
-        }
         for (var i = 0; i < instrContent.length; i++){
             instrContent[i] = "<div style='display: inline-block; margin: 0 auto; padding: 10px 200px 10px 200px; text-align: left'>"+instrContent[i]+"</div>"
         }
@@ -565,31 +630,23 @@
         return debriefContent
     };
 
-    function debriefForm_confidence(runPriming) {
-        if (runPriming == true) {
-            var debriefContent_confidence =
-                "<div style='width: 50%; text-align: left; margin: 0 auto'>" +
-                '<p>In fact, one of the shapes on the table was a letter. Do you remember what that letter was? Type in your best guess, and even if you don’t remember, just guess.<br><input name="tableNumGuess" type="text" size="50" style="width: 100%; border-radius: 4px; padding: 10px 10px; margin: 8px 0; border: 1px solid #ccc; font-size: 15px" required>' +
-                '<p>Using the slider below, on a scale of 1-100 (with 1 being not confident at all, and 100 being very confident), how confident are you about the letter you just typed above?  (This will not affect whether you receive credit or compensation.) <br> <p style="text-align:left;">Not confident at all <span style="float:right;">Very Confident</span></p> <input type="range" value="50" min="1" max="100" name = "confidence" class="slider" style="width:100%" required oninput="this.nextElementSibling.value = this.value"> <output id = "confidence_out"  style="text-align:center">_</output> </p>' +
-                "</div>"
-        } else {
-            var debriefContent_confidence =
-                "<div style='width: 50%; text-align: left; margin: 0 auto'>" +
-                '<p>In fact, one of the things on the table was a number. Do you remember what that number was? Type in your best guess, and even if you don’t remember, just guess.<br><input name="tableNumGuess" type="number" size="50" style="width: 100%; border-radius: 4px; padding: 10px 10px; margin: 8px 0; border: 1px solid #ccc; font-size: 15px" required>' +
-                '<p>Using the slider below, on a scale of 1-100 (with 1 being not confident at all, and 100 being very confident), how confident are you about the number you just typed above?  (This will not affect whether you receive credit or compensation.) <br> <p style="text-align:left;">Not confident at all <span style="float:right;">Very Confident</span></p> <input type="range" value="50" min="1" max="100" name = "confidence" class="slider" style="width:100%" required oninput="this.nextElementSibling.value = this.value"> <output id = "confidence_out"  style="text-align:center">_</output> </p>' +
-                "</div>"
-        }
+    function debriefForm_confidence() {
+        var debriefContent_confidence =
+        "<div style='width: 50%; text-align: left; margin: 0 auto'>" +
+        '<p>In fact, there was also a number on the table. Do you remember what that number was? Type in your best guess, and even if you don’t remember, just guess.<br><input name="tableNumGuess" type="number" size="50" style="width: 100%; border-radius: 4px; padding: 10px 10px; margin: 8px 0; border: 1px solid #ccc; font-size: 15px" required>' +
+        '<p>Using the slider below, on a scale of 1-100 (with 1 being not confident at all, and 100 being very confident), how confident are you about the number you just typed above?  (This will not affect whether you receive credit or compensation.) <br> <p style="text-align:left;">Not confident at all <span style="float:right;">Very Confident</span></p> <input type="range" value="50" min="1" max="100" name = "confidence" class="slider" style="width:100%" required oninput="this.nextElementSibling.value = this.value"> <output id = "confidence_out"  style="text-align:center">_</output> </p>' +
+        "</div>"
         return debriefContent_confidence
     };
 
     function closingText(participantType){
-        var base = "Thank you so much for your contribution to science! The experiment has concluded. Please contact huichao.ji@yale.edu if you have any further questions.";
+        var base = "Thank you so much for your contribution to science! The experiment has concluded. Please contact kimberly.wong@yale.edu or huichao.ji@yale.edu if you have any further questions.";
         var addition = "";
         if (participantType == 'mturk'){
-            var rand_code = hitID+String(code)+workerID;
+            var rand_code = hitID+String(code)+participantID;
             var addition = "<p>Here is your <b>unique</b> code: "+rand_code+"</p><p>To recieve payment for this experiment, you must take this code back to the page that directed you here. Enter the code into the box there. If you encounter problems during this step, please contact the email above.";
         } else if (participantType == 'prolific'){
-            var addition = "<p>For your convenience, you will find your completion code in a new tab <b>after you press the Spacebar</b>. Alternatively, here is the code for you to enter manually: <b>130AE35A</b>. If you encounter any problems during this step, please contact the email above."
+            var addition = "<p>For your convenience, you will find your completion code in a new tab <b>after you press the Spacebar</b>. Alternatively, here is the code for you to enter manually: <b>2D8B06CB</b>. If you encounter any problems during this step, please contact the email above."
         } else if (participantType == 'sona'){
             var addition = "<p>If you're interested in learning more about this experiment, please see the following google doc, and do not hesitate to reach out! Thank you for participating.</p><p>https://docs.google.com/document/d/1WxqXB8pD6Fv7XpP7IS3HsYDqlxJ-yT4M/edit?usp=sharing&ouid=109087269691106150998&rtpof=true&sd=true</p>"
         }
@@ -638,7 +695,7 @@
     */
 
 
-    function runSingleTrial(thisAgent, thisTableNum, divFlip, divRotation, runDistractorTasks, timelineTrialsToPush, trialType){
+    function runSingleTrial(thisAgent, thisTableNum, showAchImg, timelineTrialsToPush, trialType){
         // different trialType modifiers
         if (trialType == 'instr' || trialType == 'instr_nocross' || trialType == 'instr_nomask'){
             var append = '_instr'
@@ -683,29 +740,26 @@
             }
         }
 
-        var setDotTask = function(correctDir) {
-            var dotTask = {
-                type: "rdk",
-                number_of_dots: 400,
-                RDK_type: 3,
-                aperture_type: 4,
-                aperture_width: screen.width / 2,
-                aperture_height: screen.height / 2,
-                aperture_center_x: screen.width / 2,
-                aperture_center_y: screen.height / 2,
-                move_distance: 2,
-                choices: ["Leftarrow", "Rightarrow"],
-                correct_choice: correctDir,
-                coherent_direction: 180,
-                coherence: 0.3,
-                opposite_coherence: 0.2,
-                dot_radius: 3,
-                dot_color: "black",
-                background_color: "white",
-                trial_duration: 60000,
-                data: {trial_category: "dotTask" + append},
-            }
-            return dotTask
+        var dotTask = {
+            type:"rdk",
+            number_of_dots: 400,
+            RDK_type:3,
+            aperture_type:4,
+            aperture_width:screen.width/2,
+            aperture_height:screen.height/2,
+            aperture_center_x: screen.width/2,
+            aperture_center_y: screen.height/2,
+            move_distance:2,
+            choices:["Leftarrow","Rightarrow"],
+            correct_choice:"Leftarrow",
+            coherent_direction:180,
+            coherence:0.6,
+            opposite_coherence:0.1,
+            dot_radius:3,
+            dot_color:"black",
+            background_color:"white",
+            trial_duration:20000,
+            data: {trial_category:"dotTask"+append},
         }
 
         var logoTask = {
@@ -721,152 +775,134 @@
             data: {trial_category: "logoTask"+append} // data end
         } // logoTask
 
-        var enumerate = function(thisAgent, thisTableNum, imgWidth, imgHeight, divFlip, divRotation){
-            var enumeration = {
-                type: 'html-keyboard-response',
-                stimulus: function(){
 
-                    var imgPath = stimFolder + thisAgent + "_" + thisTableNum + ".png"
-                    var stimContent = "<img src='"+imgPath+"' width='"+String(imgWidth)+"' height='"+String(imgHeight)+"' class='flip" + divFlip + String(divRotation) + "'/>"
-                    // var sentence = "<p>Reminder: Does the shape on " + locationtext + " have any rounded corners?</p>"
-                    // return sentence + stimContent
-                    return stimContent
-                },
-                // choices: ["Darker","Lighter"],
-                // choices: ["Red","Blue"],
-                // choices: ["Yes rounded corner(s)","No rounded corners"],
-                choices: jsPsych.NO_KEYS,
-                trial_duration: DISC_DISP_TIME,
-                data: {trial_category: "imgDisp"+append,
-                    thisAgent: thisAgent,
-                    thisTableNum: thisTableNum,
-                    image_w: imgWidth,
-                    image_h: imgHeight,
-                    thisFlip: divFlip,
-                    thisRotate: divRotation,
-                    dispTime: DISC_DISP_TIME,
-                },
+        // var promptContent = "<div style='position: absolute; left:"+String(30)+"px ; top:"+String(h*2+30)+"px' >'f' = no ; 'j' = yes</div>";
+        // var promptContent = "<div>Can you get from the red to the blue?'<br><b>f</b>' = no ; '<b>j</b>' = yes</div>";
+        var benchImgPath = stimFolder + thisAgent + thisTableNum + ".png";
+        // var probe0ImgPath = stimFolder + "probe0v4.png"; // for stimuli_newsetup
+        // var probe1ImgPath = stimFolder + "probe1v4.png";
+        // var probe2ImgPath = stimFolder + "probe2v4.png";
+        var probe0ImgPath = stimFolder + "probe0.png"; //for stimuli
+        var probe1ImgPath = stimFolder + "probe1.png";
+        var probe2ImgPath = stimFolder + "probe2.png";
+
+        var captcha = function(benchImgPath, left, top, imgWidth, imgHeight, probe0ImgPath, probe1ImgPath, probe2ImgPath){
+            var clickResponse = {
+                type: 'kw-show-click',
+                image_path: benchImgPath,
+                left: left,
+                top: top,
+                image_w: imgWidth,
+                image_h: imgHeight,
+                probe0_path: probe0ImgPath,
+                probe1_path: probe1ImgPath,
+                probe2_path: probe2ImgPath,
+                // probe_posX: [135, 288, 330], // for stimuli_newsetup
+                // probe_posY: [263, 304, 236],
+                // probe_widths: [88, 65, 64],
+                // probe_heights: [42, 36, 33],
+                probe_posX: [111, 363, 377], // for stimuli
+                probe_posY: [332, 318, 259],
+                probe_widths: [110, 105, 51],
+                probe_heights: [50, 52, 27],
+                show_probes: false,
+                data: {trial_category: "clickResponse"+trialType}
             }
-            return enumeration
+            return clickResponse
         }
 
-
         var transitiontask1 = {
-            type: 'instructions',
-            pages: function(){
-                var text = "<p>Great! Now for the next task. On the next page, you will see some potential logos for a new company. Use your mouse and click on which logo you think would be better for the company, given that the company hopes to come across as 'organized and professional'.</p><p>When you are ready, click the button below to see the images.</p>"
-                return [text]
-            },
-            allow_keys: false,
-            allow_backward: false,
-            show_clickable_nav: true,
-            button_delay: 5000,
-            data: {trial_category: 'transition1'}
+            type: "html-keyboard-response",
+            stimulus: "<p>Great. On to the next task. On the next page, you will see two potential logos for a new company. Use your mouse and click on which logo you think would be best for the company, given that the company hopes to come across as 'very organized and professional'.</p><p>When you are ready, press the Spacebar to see the images.</p>",
+            choices: ['Spacebar'],
+            data: {trial_category: "transition"}
         }
 
         var transitiontask2 = {
-            type: 'instructions',
-            pages: function(){
-                // var text = "<p>Good job! Now for the next task. On the next page, you will see an image flash briefly on screen. </p><p>There will be many things in this image, but your job is to only look at <b>the white table</b>: On top of this table, you will see many <b>black discs</b>. Once the image disappears, you will see a box where you should type in <b>how many black discs you just saw on the table</b>. <p>The image will flash <i>very</i> quickly, so it is likely that you will not be sure how many black discs there were. Regardless, you should just <b>give your best, <u>most precise</u> guess</b>.</p><p>When you are ready, click the button below to begin.</p>"
-                // var text = "<div style='text-align: left'><p>On the next page, you will see an image flash briefly on screen. </p><p>There will be many things in this image, but your job is to only look at <b>the white table</b>: On top of this table, you will see many <b>black discs</b>. Once the image disappears, you will see a box where you should type in <b>how many black discs total you saw on the table</b>. <p>The image will flash <i>very</i> quickly, so it is likely that you will not be sure how many black discs there were. Regardless, you should just <b>give your best, <u>most precise</u> guess</b>.</p><p>When you are ready, click the button below to begin.</p></div>"
-                var text = "<div style='text-align: left'><p>On the next page, you will see an image flash briefly on screen. </p><p>There will be many things in this image, but your job is to only look at <b>the white table</b>: On top of this table, you will see many <b>black discs</b> flash after a short delay. Once the image and the discs disappear, you will see a box where you should type in <b>how many black discs total you saw flash on the table</b>. <p>The image will flash <i>very</i> quickly, so it is likely that you will not be sure how many black discs there were. Regardless, you should just <b>give your best, <u>most precise</u> guess</b>.</p><p>When you are ready, click the button below to begin.</p></div>"
-
-                return [text]
-            },
-            allow_keys: false,
-            allow_backward: false,
-            show_clickable_nav: true,
-            button_delay: 5000,
-            data: {trial_category: 'transition2'}
+            type: "html-keyboard-response",
+            stimulus: "<p>Good job! Now for the next task. On the next page, an image will appear on screen, and you should <b>click on all the white triangles</b> in the image. <p>When you are ready, press the Spacebar to begin.</p>",
+            // stimulus: "<p>Good job! Now for task #3. On the next page, an image will appear on screen, and you should <b>click on all the  <span style='color:#3a9be9'>blue rectangles</span></b>  in the image. <p>When you are ready, press the Spacebar to begin.</p>",
+            choices: ['Spacebar'],
+            data: {trial_category: "transition"}
         }
 
-        var count_discs = {
+        var transitiontask3 = {
+            type: "html-keyboard-response",
+            stimulus: "<p>Good work. Now for the next task. We're now going to test how accurately you can <b>estimate the prices</b> (in US dollars) of certain pieces of merchandise. <p>Starting on the next page, you will see an image of an object. Estimate how much you think each object is worth <i>in US dollars</i>, and then type your answer in the input box below the image of the object.</p><p>When you are ready, press the Spacebar to display this image.</p>",
+            choices: ['Spacebar'],
+            data: {trial_category: "transition"}
+        }
+
+        var rain_water = {
             type: 'survey-html-form',
-            preamble: '<p>How many black discs were there on the table in total? (Give your best, most precise guess!)</p>',
-            html: '<p><input type="number" id="count_discs" name="response" size="10" /> black discs</p>',
-            autofocus: 'count_discs',
+            preamble: '<p>Please answer the following question <b>without looking up the answer</b>, since we are interested in your intuitive <i>guess</i>: </p><p>How many <u>days of rain</u> do you think that the town of Dubuque, Iowa gets on average per year?</p>',
+            html: '<p><input type="number" id="rain_water" name="response" size="10" /> days of rain</p>',
+            autofocus: 'rain_water',
             // data: {trial_category:"anchor_suitcase"}
             data: {trial_category:"answer"+append,
                 thisAgent: thisAgent,
                 thisTableNum: thisTableNum,
-                dispTime: DISC_DISP_TIME,}
+            }
         }
 
-        var isiBlank = {
-            type: 'html-keyboard-response',
-            stimulus: '',
-            choices: jsPsych.NO_KEYS,
-            trial_duration: ISI_DURATION,
+        var anchor_suitcase = {
+            type: 'survey-html-form',
+            preamble: '<p>Please answer the following question <b>without looking up the answer</b>, since we are interested in your intuitive <i>guess</i>:</p><p>Without knowing any more details other than what is in the photo, how much in US dollars do you think this suitcase is worth? (<u>Be as precise as possible!</u>)</p>',
+            html: '<div style="text-align: center;"><img src="'+stimFolder+'suitcase.png"></img></div>'+'<p><input type="number" id="anchorJudge_suitcase" name="response" size="10" /> dollars</p>',
+            autofocus: 'anchorJudge_suitcase',
+            // data: {trial_category:"anchor_suitcase"}
+            data: {trial_category:"answer"+append,
+                thisAgent: thisAgent,
+                thisTableNum: thisTableNum,
+            }
+        }
+        var anchor_watch = {
+            type: 'survey-html-form',
+            preamble: '<p>Without knowing any more details other than what is in the photo, how much in US dollars do you think this watch is worth?</p>',
+            html: '<div style="text-align: center;"><img src="'+stimFolder+'watch.png"></img></div>'+'<p><input type="number" id="anchorJudge_watch" name="response" size="10" /> dollars</p>',
+            autofocus: 'anchorJudge_watch',
+            // data: {trial_category:"anchor_watch"}
             data: {
-                trial_category: "imgDisp" + append,
-                dispTime: ISI_DURATION,
-            },
-        }
-
-        var isi_noDots = function(thisAgent, thisTableNum, imgWidth, imgHeight, divFlip, divRotation){
-            var enumeration = {
-                type: 'html-keyboard-response',
-                stimulus: function(){
-
-                    var imgPath = stimFolder + thisAgent + "_blank.png"
-                    var stimContent = "<img src='"+imgPath+"' width='"+String(imgWidth)+"' height='"+String(imgHeight)+"' class='flip" + divFlip + String(divRotation) + "'/>"
-                    // var sentence = "<p>Reminder: Does the shape on " + locationtext + " have any rounded corners?</p>"
-                    // return sentence + stimContent
-                    return stimContent
-                },
-                // choices: ["Darker","Lighter"],
-                // choices: ["Red","Blue"],
-                // choices: ["Yes rounded corner(s)","No rounded corners"],
-                choices: jsPsych.NO_KEYS,
-                trial_duration: DISC_DISP_TIME,
-                data: {trial_category: "imgDisp"+append,
-                    thisAgent: thisAgent,
-                    thisTableNum: thisTableNum,
-                    image_w: imgWidth,
-                    image_h: imgHeight,
-                    thisFlip: divFlip,
-                    thisRotate: divRotation,
-                    dispTime: ISI_NODOTS_DISPTIME,
-                },
+                trial_category: "answer" + append,
+                thisAgent: thisAgent,
+                thisTableNum: thisTableNum,
             }
-            return enumeration
         }
-
-        function shuffle(array) {
-            let currentIndex = array.length, randomIndex;
-            while (currentIndex > 0){
-                randomIndex = Math.floor(Math.random() * currentIndex);
-                currentIndex--;
-                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]]
+        var anchor_headphone = {
+            type: 'survey-html-form',
+            preamble: '<p>Without knowing any more details other than what is in the photo, how much in US dollars do you think this headphone is worth?</p>',
+            html: '<div style="text-align: center;"><img src="'+stimFolder+'headphone.png"></img></div>'+'<p><input type="number" id="anchorJudge_headphone" name="response" size="10" /> dollars</p>',
+            autofocus: 'anchorJudge_headphone',
+            // data: {trial_category:"anchor_headphone"}
+            data: {trial_category:"answer"+append,
+                thisAgent: thisAgent,
+                thisTableNum: thisTableNum,
             }
-            return array
         }
-
-        /* for all versions regardless of number of symbols on table + jacket or whatever */
-        var randDotAns = ["Leftarrow", "Rightarrow", "Leftarrow", "Rightarrow"]
 
         timelineTrialsToPush.push(if_notFull);
-
-        if (runDistractorTasks == true){
-            timelineTrialsToPush.push(setDotTask(randDotAns[0]));
-            timelineTrialsToPush.push(setDotTask(randDotAns[1]));
-            timelineTrialsToPush.push(setDotTask(randDotAns[2]));
-            timelineTrialsToPush.push(transitiontask1);
-            timelineTrialsToPush.push(logoTask);
-        }
+        // timelineTrialsToPush.push(cursor_off);
+        timelineTrialsToPush.push(dotTask);
+        timelineTrialsToPush.push(transitiontask1);
+        timelineTrialsToPush.push(logoTask);
         timelineTrialsToPush.push(transitiontask2);
-        timelineTrialsToPush.push(cursor_off);
-        timelineTrialsToPush.push(isiBlank);
-        timelineTrialsToPush.push(isi_noDots(thisAgent, thisTableNum, imgWidth, imgHeight, divFlip, divRotation));
-        timelineTrialsToPush.push(enumerate(thisAgent, thisTableNum, imgWidth, imgHeight, divFlip, divRotation));
-        timelineTrialsToPush.push(cursor_on);
-        timelineTrialsToPush.push(count_discs);
+        // timelineTrialsToPush.push(captcha(benchImgPath,20,20,imgWidth,imgHeight, probe0ImgPath, probe1ImgPath));
+        //timelineTrialsToPush.push(captcha(benchImgPath,20,20,imgWidth,imgHeight, probe0ImgPath, probe1ImgPath, probe2ImgPath));
+        timelineTrialsToPush.push(captcha(benchImgPath,20,20,imgWidth,imgHeight, probe0ImgPath, probe1ImgPath, probe2ImgPath));
 
-
+        if (showAchImg == true){
+            // timelineTrialsToPush.push(rain_water);
+            // timelineTrialsToPush.push(transitiontask3);
+            timelineTrialsToPush.push(anchor_suitcase);
+            // timelineTrialsToPush.push(anchor_suitcase,anchor_watch,anchor_headphone);
+            // timelineTrialsToPush.push(cursor_on);
+        }
     } /* run single trial end */
+
+
 
     </script>
 </body>
 </html>
 
-<!-- http://perceptionexperiments.net/KWW/ptAnch/ptTD02012024_sideView.html -->
+<!-- perceptionexperiments.net/KWW/ullObs/ullObs_04012022.html -->
