@@ -828,7 +828,7 @@
 
         var transitiontask3 = {
             type: "html-keyboard-response",
-            stimulus: "<p>Good work. Now for the next task. We're now going to test how accurately you can <b>estimate the prices</b> (in US dollars) of certain pieces of merchandise. <p>Starting on the next page, you will see an image of an object. Estimate how much you think each object is worth <i>in US dollars</i>, and then type your answer in the input box below the image of the object.</p><p>When you are ready, press the Spacebar to display this image.</p>",
+            stimulus: "<p>Good work. Now for the next task. We're now going to test how accurately you can <b>estimate the prices</b> (in US dollars) of certain pieces of merchandise. <p>On the next page, you will see an image of an object. Estimate how much you think this object is worth <i>in US dollars</i>, and then type your answer in the input box below the image of the object.</p><p>When you are ready, press the Spacebar to display this image.</p>",
             choices: ['Spacebar'],
             data: {trial_category: "transition"}
         }
@@ -847,7 +847,8 @@
 
         var anchor_suitcase = {
             type: 'survey-html-form',
-            preamble: '<p>Please answer the following question <b>without looking up the answer</b>, since we are interested in your intuitive <i>guess</i>:</p><p>Without knowing any more details other than what is in the photo, how much in US dollars do you think this suitcase is worth? (<u>Be as precise as possible!</u>)</p>',
+            // preamble: '<p>Please answer the following question <b>without looking up the answer</b>, since we are interested in your intuitive <i>guess</i>:</p><p>Without knowing any more details other than what is in the photo, how much in US dollars do you think this suitcase is worth? (<u>Be as precise as possible!</u>)</p>',
+            preamble: '<p>Please answer the following question <b>without looking up the answer</b>, since we are interested in your intuitive <i>guess</i>:</p><p>Without knowing any more details other than what is in the photo, how much in US dollars do you think this suitcase is worth?</p>',
             html: '<div style="text-align: center;"><img src="'+stimFolder+'suitcase.png"></img></div>'+'<p><input type="number" id="anchorJudge_suitcase" name="response" size="10" /> dollars</p>',
             autofocus: 'anchorJudge_suitcase',
             // data: {trial_category:"anchor_suitcase"}
@@ -892,7 +893,7 @@
 
         if (showAchImg == true){
             // timelineTrialsToPush.push(rain_water);
-            // timelineTrialsToPush.push(transitiontask3);
+            timelineTrialsToPush.push(transitiontask3);
             timelineTrialsToPush.push(anchor_suitcase);
             // timelineTrialsToPush.push(anchor_suitcase,anchor_watch,anchor_headphone);
             // timelineTrialsToPush.push(cursor_on);
