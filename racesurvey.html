@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+</head>
+<body>
+  <h2>Question 1: Are you of Hispanic, Latino, or Spanish origin?</h2>
+  <p><em><b>(Select only one)</b></em></p>
+  <ul>
+    <label><input type="radio" name="hispanic_origin" value="no"> No, not of Hispanic, Latino, or Spanish origin</label><br>
+    <label><input type="radio" name="hispanic_origin" value="mexican"> Yes, Mexican, Mexican American, or Chicano</label><br>
+    <label><input type="radio" name="hispanic_origin" value="puerto_rican"> Yes, Puerto Rican</label><br>
+    <label><input type="radio" name="hispanic_origin" value="cuban"> Yes, Cuban</label><br>
+    <label><input type="radio" name="hispanic_origin" value="other_hispanic"> Yes, another Hispanic, Latino, or Spanish origin</label>
+      <input type="text" name="other_hispanic_specify" placeholder="Please specify">
+    
+  </ul>
+
+  <h2>Question 2: What is your race?</h2>
+  <p><em><b>(Select one or more)</b></em></p>
+
+  <h3>White</h3>
+  <ul>
+      <label><input type="checkbox" name="race" value="white"> White</label>
+      <input type="text" name="white_specify" placeholder="Please specify">
+  </ul>
+
+  <h3>Black or African American</h3>
+  <ul>
+      <label><input type="checkbox" name="race" value="black"> Black or African American</label>
+      <input type="text" name="black_specify" placeholder="Please specify">
+  </ul>
+
+  <h3>American Indian or Alaska Native</h3>
+  <ul>
+    <label><input type="checkbox" name="race" value="american_indian"> American Indian or Alaska Native</label>
+      <input type="text" name="tribe_specify" placeholder="Please specify enrolled or principal tribe">
+  </ul>
+
+  <h3>Asian <em>(Select one or more, or specify)</em></h3>
+  <ul>
+    <label><input type="checkbox" name="race" value="chinese"> Chinese</label><br>
+    <label><input type="checkbox" name="race" value="filipino"> Filipino</label><br>
+    <label><input type="checkbox" name="race" value="asian_indian"> Asian Indian</label><br>
+    <label><input type="checkbox" name="race" value="japanese"> Japanese</label><br>
+    <label><input type="checkbox" name="race" value="korean"> Korean</label><br>
+    <label><input type="checkbox" name="race" value="vietnamese"> Vietnamese</label><br>
+    <label><input type="checkbox" name="race" value="other_asian"> Other Asian</label>
+      <input type="text" name="other_asian_specify" placeholder="Please specify">
+    
+  </ul>
+
+  <h3>Native Hawaiian or Other Pacific Islander <em>(Select one or more, or specify)</em></h3>
+  <ul>
+    <label><input type="checkbox" name="race" value="native_hawaiian"> Native Hawaiian</label><br>
+    <label><input type="checkbox" name="race" value="samoan"> Samoan</label><br>
+    <label><input type="checkbox" name="race" value="chamorro"> Chamorro</label><br>
+    <label><input type="checkbox" name="race" value="other_pacific_islander"> Other Pacific Islander</label>
+      <input type="text" name="other_pacific_islander_specify" placeholder="Please specify">
+    
+  </ul>
+
+  <h3>Other Race</h3>
+  <ul>
+    <label><input type="checkbox" name="race" value="other_race"> Some other race</label>
+      <input type="text" name="other_race_specify" placeholder="Please specify">
+    
+  </ul>
+</body>
+</html>

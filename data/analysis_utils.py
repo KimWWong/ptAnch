@@ -77,7 +77,7 @@ class AnalysisUtils:
 
         else:
             badPNoRT = []
-            goodPNoRT = groupedcumudf["pNo"].unique()
+            goodPNoRT = goodcumudf["pNo"].unique()
 
         allbadPNo = list(badPNoAcc) + list(badPNoRT)
         allgoodPNo = list(

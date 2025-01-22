@@ -11,7 +11,7 @@ from analysis_utils import AnalysisUtils as au
 
 def main():
 
-    folderName = PathUtils.get_curr_path() + "/06102024_asianfem_revisit/"
+    folderName = PathUtils.get_curr_path() + "/06122024_asianfem_revist_instr/"
 
     debriefType = "none"  ## seq or none, if there is extended debrief or not
     trialScreenCriteria = "2SDentiredataset"  ## 2SDentiredataset, 2SDindividual, boths

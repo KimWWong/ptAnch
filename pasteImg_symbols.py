@@ -22,6 +22,8 @@ def layerImages(backgroundImg, firstLayerImg, secondLayerImg, newImgName):
 
     # baseImg.paste(blockImg, (250,100), blockImg)
     baseImg.paste(firstImg, (0, 0), firstImg)
+    # ## new method to deal with artifacts
+    # Image.alpha_composite(baseImg, addImg).save(outFolder + newFileName+ ".png", format="png")
 
     if secondLayerImg != 0:
         baseImg.paste(secondImg, (0, 0), secondImg)
